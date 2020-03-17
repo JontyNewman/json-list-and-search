@@ -1,4 +1,4 @@
-# ![logo](https://raw.githubusercontent.com/me5h/goldfish-todo/blob/master/goldfish.jpeg)
+# ![logo](https://raw.githubusercontent.com/me5h/goldfish-todo/master/goldfish.jpeg)
 
 # Goldfish todo Tools
 List of ToDo's and posts
