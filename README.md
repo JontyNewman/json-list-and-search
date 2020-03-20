@@ -1,5 +1,3 @@
-# ![logo](https://raw.githubusercontent.com/me5h/goldfish-todo/master/goldfish.jpeg)
-
 # JSON List and Search
 List of ToDo's and posts
 
