@@ -1,6 +1,6 @@
 # ![logo](https://raw.githubusercontent.com/me5h/goldfish-todo/master/goldfish.jpeg)
 
-# Goldfish todo Tools
+# JSON List and Search
 List of ToDo's and posts
 
 ## Conditions
