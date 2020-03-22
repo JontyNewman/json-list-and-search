@@ -1,24 +1,120 @@
 <!doctype html>
-
 <html lang="en">
 <head>
   <meta charset="utf-8">
-
   <title>List of Posts and Users</title>
-  <meta name="description" content="The HTML5 Herald">
-  <meta name="author" content="SitePoint">
+  <meta name="description" content="Basic HTML5 setup">
+  <meta name="author" content="MarcusOaten">
+<style>
+* {
+  box-sizing: border-box;
+}
 
-  <link rel="stylesheet" href="css/styles.css?v=1.0">
+#searchInput {
+  background-position: 10px 12px;
+  background-repeat: no-repeat;
+  width: 100%;
+  font-size: 16px;
+  padding: 12px 20px 12px 40px;
+  border: 1px solid #ddd;
+  margin-bottom: 12px;
+}
 
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+ul li {
+  border: 1px solid #ddd;
+  margin-top: -1px; 
+  background-color: #f6f6f6;
+  padding: 12px;
+  text-decoration: none;
+  font-size: 18px;
+  color: black;
+  display: block
+}
+
+</style>
 </head>
-
 <body>
 	<h1>List of Posts and Users</h1>
-	<p>Create a page that pulls a list of posts from https://jsonplaceholder.typicode.com/todos, and a list of users from https://jsonplaceholder.typicode.com/users and caches them. Display a list of the stored posts Enable search on one or more of the post fields or linked fields (eg. title, username) Highlight search terms in results Provide a way to remove a post from the cache</p>
-  <script src="js/scripts.js"></script>
+	<p>Create a page that pulls a list of posts from: https://jsonplaceholder.typicode.com/todos 
+	<br>and a list of users from: https://jsonplaceholder.typicode.com/users 
+	<br>and caches them. 
+	<br>Display a list of the stored posts 
+	<br>Enable search on one or more of the post fields or linked fields (eg. title, username) Highlight search terms in results 
+	<br>Provide a way to remove a post from the cache</p>
+	<div id="search">
+<h1>Enable Search of Post Titles</h1>
+<input type="text" id="searchInput" onkeyup="searchFunction()" placeholder="Search for titles" title="Type in a title">
+	</div>
+	<h1>List of Posts</h1>
+    <ul id="listOfPosts"></ul>
+    <script>
+        fetch('https://jsonplaceholder.typicode.com/todos',{cache: "force-cache"})
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                appendData(data);
+            })
+            .catch(function (err) {
+                console.log('error: ' + err);
+            });
+
+        function appendData(data) {
+            var postContainer = document.getElementById("listOfPosts");
+            for (var i = 0; i < data.length; i++) {
+                var div = document.createElement("li");
+                div.innerHTML = '<a href="#">' + data[i].title + '</a><br>ID:' + data[i].id ;
+                postContainer.appendChild(div);
+            }
+        }
+    </script>
+    <h1>List of users</h1>
+    <ul id="listOfUsers"></ul>
+       <script>
+                fetch('https://jsonplaceholder.typicode.com/users',{cache: "force-cache"})
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (userdata) {
+                appendUserData(userdata);
+            })
+            .catch(function (err) {
+                console.log('error: ' + err);
+            });
+
+        function appendUserData(userdata) {
+            var userContainer = document.getElementById("listOfUsers");
+            for (var i = 0; i < userdata.length; i++) {
+                var div = document.createElement("li");
+                div.innerHTML = 'Name: ' + userdata[i].name + '<br> UserName: ' + userdata[i].username;
+                userContainer.appendChild(div);
+            }
+        }
+</script>
+
+    <script>
+function searchFunction() {
+    var input, filter, ul, li, a, i, txtValue;
+    input = document.getElementById("searchInput");
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("listOfPosts");
+    li = ul.getElementsByTagName("li");
+    for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByTagName("a")[0];
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.backgroundColor = "yellow";
+        } else {
+            li[i].style.backgroundColor = "";
+        }
+    }
+}
+</script>
 </body>
 </html>
-
-https://jsonplaceholder.typicode.com/todos
-
-https://jsonplaceholder.typicode.com/users 
