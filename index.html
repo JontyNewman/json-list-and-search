@@ -5,39 +5,6 @@
   <title>List of Posts and Users</title>
   <meta name="description" content="Basic HTML5 setup">
   <meta name="author" content="MarcusOaten">
-<style>
-* {
-  box-sizing: border-box;
-}
-
-#searchInput {
-  background-position: 10px 12px;
-  background-repeat: no-repeat;
-  width: 100%;
-  font-size: 16px;
-  padding: 12px 20px 12px 40px;
-  border: 1px solid #ddd;
-  margin-bottom: 12px;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-ul li {
-  border: 1px solid #ddd;
-  margin-top: -1px; 
-  background-color: #f6f6f6;
-  padding: 12px;
-  text-decoration: none;
-  font-size: 18px;
-  color: black;
-  display: block
-}
-
-</style>
 </head>
 <body>
 	<h1>List of Posts and Users</h1>
@@ -47,74 +14,161 @@ ul li {
 	<br>Display a list of the stored posts 
 	<br>Enable search on one or more of the post fields or linked fields (eg. title, username) Highlight search terms in results 
 	<br>Provide a way to remove a post from the cache</p>
-	<div id="search">
-<h1>Enable Search of Post Titles</h1>
-<input type="text" id="searchInput" onkeyup="searchFunction()" placeholder="Search for titles" title="Type in a title">
-	</div>
-	<h1>List of Posts</h1>
-    <ul id="listOfPosts"></ul>
-    <script>
-        fetch('https://jsonplaceholder.typicode.com/todos',{cache: "force-cache"})
-            .then(function (response) {
-                return response.json();
-            })
-            .then(function (data) {
-                appendData(data);
-            })
-            .catch(function (err) {
-                console.log('error: ' + err);
-            });
+	
+	<section id="app">
+		<p>Please wait.</p>
+		<p>JavaScript is required for this application.</p>
+	</section>
 
-        function appendData(data) {
-            var postContainer = document.getElementById("listOfPosts");
-            for (var i = 0; i < data.length; i++) {
-                var div = document.createElement("li");
-                div.innerHTML = '<a href="#">' + data[i].title + '</a><br>ID:' + data[i].id ;
-                postContainer.appendChild(div);
-            }
-        }
-    </script>
-    <h1>List of users</h1>
-    <ul id="listOfUsers"></ul>
-       <script>
-                fetch('https://jsonplaceholder.typicode.com/users',{cache: "force-cache"})
-            .then(function (response) {
-                return response.json();
-            })
-            .then(function (userdata) {
-                appendUserData(userdata);
-            })
-            .catch(function (err) {
-                console.log('error: ' + err);
-            });
+	<script>
 
-        function appendUserData(userdata) {
-            var userContainer = document.getElementById("listOfUsers");
-            for (var i = 0; i < userdata.length; i++) {
-                var div = document.createElement("li");
-                div.innerHTML = 'Name: ' + userdata[i].name + '<br> UserName: ' + userdata[i].username;
-                userContainer.appendChild(div);
-            }
-        }
-</script>
+		var id = 'app';
+		var posts = [];
+		var users = [];
+		var url = {
+			posts: 'https://jsonplaceholder.typicode.com/todos',
+			users: 'https://jsonplaceholder.typicode.com/users'
+		};
 
-    <script>
-function searchFunction() {
-    var input, filter, ul, li, a, i, txtValue;
-    input = document.getElementById("searchInput");
-    filter = input.value.toUpperCase();
-    ul = document.getElementById("listOfPosts");
-    li = ul.getElementsByTagName("li");
-    for (i = 0; i < li.length; i++) {
-        a = li[i].getElementsByTagName("a")[0];
-        txtValue = a.textContent || a.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            li[i].style.backgroundColor = "yellow";
-        } else {
-            li[i].style.backgroundColor = "";
-        }
-    }
-}
-</script>
+		var initialize = id => {
+
+			var root = document.getElementById(id);
+			var p = document.createElement('p');
+			var ul = document.createElement('ul');
+			var input = toInput(ul);
+
+			root.innerHTML = '';
+
+			p.appendChild(input);
+
+			root.appendChild(p);
+			root.appendChild(ul);
+
+			fetch(url.users)
+				.then(response => response.json())
+				.then(decoded => {
+
+					users = decoded;
+					return fetch(url.posts);
+				})
+				.then(response => response.json())
+				.then(decoded => {
+
+					posts = decoded;
+					appendTo(ul, posts, '');
+				})
+				.catch(error => console.error(error));
+		};
+
+		var toInput = (ul) => {
+
+			var input = document.createElement('input');
+
+			input.addEventListener('keyup', event => {
+				ul.innerHTML = '';
+				appendTo(ul, posts, input.value);
+			});
+
+			return input;
+		};
+
+		var appendTo = (ul, posts, phrase) => {
+
+			posts.forEach((post, i) => {
+
+				var li = toListItem(post, i, phrase);
+
+				ul.append(li);
+			});
+		};
+
+		var toListItem = (post, i, phrase) => {
+
+			var li = document.createElement('li');
+
+			li.append(toListItemCheckbox(post.completed));
+			li.append(document.createTextNode(' '));
+			li.append(toListItemTitle(post.title, phrase));
+			li.append(document.createTextNode(' '));
+			li.append(toListItemRemoval(li, i));
+
+			return li;
+		};
+
+		var toListItemTitle = (title, phrase) => {
+
+			var index = -1;
+			var nodes = [];
+			var span = document.createElement('span');
+
+			if (phrase.length) {
+				index = title.indexOf(phrase);
+			}
+
+			if (index >= 0) {
+				nodes = toListItemTitleNodes(title, index, phrase.length);
+			} else {
+				nodes.push(document.createTextNode(title));
+			}
+
+			nodes.forEach(node => span.append(node));
+
+			return span;
+		};
+
+		var toListItemTitleNodes = (title, start, length) => {
+
+			var nodes = [];
+			var mark = document.createElement('mark');
+
+			mark.append(title.substr(start, length));
+
+			if (start > 0) {
+				nodes.push(document.createTextNode(title.substr(0, start)));
+			}
+
+			nodes.push(mark);
+
+			if (start + length < title.length) {
+				nodes.push(document.createTextNode(title.substr(start + length)));
+			}
+
+			return nodes;
+		};
+
+		var toListItemCheckbox = completed => {
+
+			var checkbox = document.createElement('input');
+
+			checkbox.setAttribute('type', 'checkbox');
+			checkbox.setAttribute('disabled', '');
+
+			if (completed) {
+				checkbox.setAttribute('checked', 'checked');
+			}
+
+			return checkbox;
+		};
+
+		var toListItemRemoval = (li, i) => {
+
+			var a = document.createElement('a');
+			var prompt = document.createTextNode('Remove');
+
+			a.setAttribute('href', '#');
+			a.append(prompt);
+			a.addEventListener('click', event => {
+
+				event.preventDefault();
+				posts.splice(i, 1);
+				li.remove();
+			});
+
+			return a;
+		};
+
+		initialize(id);
+	</script>
 </body>
 </html>
+
